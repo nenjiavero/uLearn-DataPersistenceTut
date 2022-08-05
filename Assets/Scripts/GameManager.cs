@@ -10,8 +10,7 @@ public class GameManager : MonoBehaviour
 {
     [Header("Variables")]
     public int topScore;
-    public string topPlayer;
-    public int thisScore;
+    public string topPlayer;    
     public string thisPlayer = "none";
     [Space(16)]
     [Header("Objects")]
@@ -32,7 +31,6 @@ public class GameManager : MonoBehaviour
     {
         topScore = PlayerPrefs.GetInt("topScore");
         topPlayer = PlayerPrefs.GetString("thePlayer");
-            
     }
     
     void Update()

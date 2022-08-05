@@ -25,19 +25,28 @@ public class MainManager : MonoBehaviour
 
     GameManager gameMan;
 
+
     
-    // Start is called before the first frame update
-    void Start()
+
+    private void Awake()
     {
         gameMan = GameObject.Find("GameManager").GetComponent<GameManager>();
 
         thisPlayerName = gameMan.thisPlayer;
-        topPlayerName = gameMan.topPlayer;
-        m_BestPoints = gameMan.topScore;
+        Debug.Log("thisPlayerName = gameMan.thisPlayer: " + thisPlayerName);
 
-        UpdateBestScoreText(m_BestPoints, topPlayerName);
+        m_BestPoints = PlayerPrefs.GetInt("topScore");
+        Debug.Log("TopScore: " + m_BestPoints);
+        topPlayerName = PlayerPrefs.GetString("thePlayer");
+        Debug.Log("TopPlayer: " + topPlayerName);
 
+        bestScoreText.text = "Best Score: " + topPlayerName + ": " + m_BestPoints;
+    }
 
+    // Start is called before the first frame update
+    void Start()
+    {
+     
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -74,6 +83,7 @@ public class MainManager : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
+
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
         }
@@ -88,13 +98,10 @@ public class MainManager : MonoBehaviour
 
         if (m_Points > m_BestPoints)
         {
-            PlayerPrefs.SetInt("topScore", m_BestPoints);
-            PlayerPrefs.SetString("thePlayer", thisPlayerName);
-
-            gameMan.topPlayer = thisPlayerName;
-            gameMan.topScore = m_Points;
-
-            UpdateBestScoreText(m_Points, thisPlayerName);
+            m_BestPoints = m_Points;
+            topPlayerName = thisPlayerName;
+            Debug.Log("Player" + thisPlayerName + " beat highscore: " + m_Points);
+            UpdateBestScore(m_Points, thisPlayerName);
         }
     }
 
@@ -103,11 +110,22 @@ public class MainManager : MonoBehaviour
         m_GameOver = true;
         GameOverText.SetActive(true);
 
-        
+        PlayerPrefs.SetInt("topScore", m_BestPoints);
+        PlayerPrefs.SetString("thePlayer", topPlayerName);
+
     }
 
-    void UpdateBestScoreText(int score,string name)
+    void UpdateBestScore(int score,string name)
     {
+        Debug.Log("Updated scores:");
+        gameMan.topPlayer = name;
+        gameMan.topScore = score;
+
+        Debug.Log("gmTopP " + gameMan.topPlayer + " with " + gameMan.topScore + " gmpoins!");
+
+        PlayerPrefs.SetInt("topScore", score);
+        PlayerPrefs.SetString("thePlayer", name);
+
         bestScoreText.text = "Best Score: " + name + ": " + score;
     }
 }
