@@ -10,18 +10,34 @@ public class MainManager : MonoBehaviour
     public int LineCount = 6;
     public Rigidbody Ball;
 
-    public Text ScoreText;
+    public Text scoreText;
+    public Text bestScoreText;
     public GameObject GameOverText;
     
     private bool m_Started = false;
     private int m_Points;
+    private int m_BestPoints;
     
     private bool m_GameOver = false;
+
+    string thisPlayerName;
+    string topPlayerName;
+
+    GameManager gameMan;
 
     
     // Start is called before the first frame update
     void Start()
     {
+        gameMan = GameObject.Find("GameManager").GetComponent<GameManager>();
+
+        thisPlayerName = gameMan.thisPlayer;
+        topPlayerName = gameMan.topPlayer;
+        m_BestPoints = gameMan.topScore;
+
+        UpdateBestScoreText(m_BestPoints, topPlayerName);
+
+
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -36,6 +52,7 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+
     }
 
     private void Update()
@@ -60,17 +77,37 @@ public class MainManager : MonoBehaviour
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
         }
+
+
     }
 
     void AddPoint(int point)
     {
         m_Points += point;
-        ScoreText.text = $"Score : {m_Points}";
+        scoreText.text = $"Score : {m_Points}";
+
+        if (m_Points > m_BestPoints)
+        {
+            PlayerPrefs.SetInt("topScore", m_BestPoints);
+            PlayerPrefs.SetString("thePlayer", thisPlayerName);
+
+            gameMan.topPlayer = thisPlayerName;
+            gameMan.topScore = m_Points;
+
+            UpdateBestScoreText(m_Points, thisPlayerName);
+        }
     }
 
     public void GameOver()
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+
+        
+    }
+
+    void UpdateBestScoreText(int score,string name)
+    {
+        bestScoreText.text = "Best Score: " + name + ": " + score;
     }
 }
